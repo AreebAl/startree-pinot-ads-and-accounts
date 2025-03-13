@@ -1,0 +1,31 @@
+service: startreepinot-disableds
+frameworkVersion: '3'
+region: eu-central-1 
+provider:
+  name: aws
+  runtime: nodejs20.x
+  environment:
+    STARTREE_API_KEY: st-bBAI7De9ULtGDzvh-IPqHodZkMhAcdwg2etLUuDxEsA0Rp1AV
+    STARTREEAPIURL: https://broker.pinot.celpxu.cp.s7e.startree.cloud/query/sql
+
+
+functions:
+  function1:
+    handler: index.handler
+    events:
+      - http:
+          path: getAds
+          method: get
+          cors: true
+
+  function2:
+    handler: index.accounts
+    events:
+      - http:
+          path: getAccounts
+          method: get
+          cors: true        
+
+
+plugins:
+  - serverless-offline
