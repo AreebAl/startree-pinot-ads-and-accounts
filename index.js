@@ -1,6 +1,8 @@
 const axios = require('axios');
 
-module.exports.handler = async () => {
+
+
+module.exports.ads = async () => {
   const query = `
       SELECT 
           network,
@@ -12,9 +14,17 @@ module.exports.handler = async () => {
           SUM(total_ads) AS total,
           SUM(activeads) AS active,
           SUM(disabled_ads_count) AS disabled,
-          ROUND((SUM(disabled_ads_count) / SUM(total_ads)) * 100, 2) AS percentage
+          ROUND((SUM(disabled_ads_count) / SUM(total_ads)) * 100, 2) AS percentage,
+           ad_name,
+          facebookaccountid,
+          created_time,
+          fa_name
       FROM FacebookAds
-      GROUP BY business_center_name,network
+      GROUP BY business_center_name,network,
+       ad_name,
+        facebookaccountid,
+        created_time,
+        fa_name
       `;
 
   try {
@@ -31,12 +41,17 @@ module.exports.handler = async () => {
     );
 
     const data = response.data.resultTable.rows.map(row => ({
-      business_manager: row[4],
+      business_manager: row[5],
       network: row[0],
-      total: row[5],
-      active: row[6],
-      disabled: row[7],
-      percentage: `${row[8]}%`
+      total: row[6],
+      active: row[7],
+      disabled: row[8],
+      percentage: `${row[9]}%`,
+      ad_name: row[10],
+      account_id: row[11],
+      created_time: convertEpochToDate(row[12]),
+      fa_name: row[13]
+      
     }));
 
     const summary = {
@@ -129,4 +144,19 @@ module.exports.accounts = async () => {
       body: JSON.stringify({ error: 'Failed to fetch data from StarTree Pinot' }),
     };
   }
+};
+
+
+const convertEpochToDate = (epochTime) => {
+  const date = new Date(
+      epochTime.toString().length === 10 
+          ? epochTime * 1000 
+          : epochTime 
+  );
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0'); 
+  const year = date.getFullYear();
+
+  return `${day}-${month}-${year}`;
 };

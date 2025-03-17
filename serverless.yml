@@ -11,7 +11,7 @@ provider:
 
 functions:
   function1:
-    handler: index.handler
+    handler: index.ads
     events:
       - http:
           path: getAds
